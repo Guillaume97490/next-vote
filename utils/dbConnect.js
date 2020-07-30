@@ -13,8 +13,9 @@ async function dbConnect() {
   let url = ''
   if (process.env.MONGODB_URI) {
     url = process.env.MONGODB_URI
+  } else {
+    url = 'mongodb://localhost:27017/simplonvote'
   }
-  url = 'mongodb://localhost:27017/simplonvote'
   const db = await mongoose.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
