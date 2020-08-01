@@ -21,6 +21,7 @@ function Copyright() {
           </Box>
           <Link target="_blank" 
           color="inherit" 
+          rel="noopener"
           href="https://guillaume97490.github.io/"
           >
             Guillaume97490
