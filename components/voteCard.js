@@ -1,14 +1,7 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { Box } from '@material-ui/core';
+import { Box, Card, CardActionArea, CardContent, LinearProgress, Typography } from '@material-ui/core';
 import GroupIcon from '@material-ui/icons/Group';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
-
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   root: {
@@ -36,7 +29,7 @@ export default function VoteCard({vote, user}) {
             </Typography>
           </Box>
           <Typography variant="body2" noWrap color="textPrimary" component="p">
-            {vote.createdBy.login && 
+            {vote.createdBy && vote.createdBy.login && 
               `de ${vote.createdBy.login}`
             }
           </Typography>
@@ -58,7 +51,7 @@ export default function VoteCard({vote, user}) {
               </Typography>
               
             </Box>
-            {vote.createdBy._id === user.id && vote.status === 'finished' &&
+            {vote.createdBy && vote.createdBy._id === user.id && vote.status === 'finished' &&
               <Box display="flex" alignItems="center">
                 <Typography component="p" color="textSecondary" variant="body2">
                 {vote.nbVote} / {vote.quota}

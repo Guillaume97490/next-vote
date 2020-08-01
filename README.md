@@ -1,7 +1,7 @@
 # Next-vote - Application de vote en ligne
 
 ## Description
-Application en ligne permettant aux utilisateurs de créer, voter et voir le résultat des sujets de votes
+Application en ligne permettant aux utilisateurs de créer, voter et voir le résultat des sujets de votes.
 
 ## Fonctionnalité 
 - Création de sujet de vote

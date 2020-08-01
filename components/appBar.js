@@ -1,32 +1,20 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import HomeIcon from '@material-ui/icons/Home'
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import { useUser } from 'utils/hooks'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-
-import Hidden from '@material-ui/core/Hidden';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
-import ReorderIcon from '@material-ui/icons/Reorder';
-import BookmarkIcon from '@material-ui/icons/Bookmark';
-import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
+import { useUser } from 'utils/hooks'
+import {AppBar, Divider, Drawer, Hidden, IconButton, List, ListItem, ListItemIcon, ListItemText,
+  Menu, MenuItem, SwipeableDrawer, Toolbar, Typography} from '@material-ui/core';
+// import Link from 'next/link'
+import Link from 'src/Link'
+import MenuIcon from '@material-ui/icons/Menu'
+import AccountCircle from '@material-ui/icons/AccountCircle'
+import HomeIcon from '@material-ui/icons/Home'
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd'
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck'
+import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay'
+import ReorderIcon from '@material-ui/icons/Reorder'
+import BookmarkIcon from '@material-ui/icons/Bookmark'
+import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew'
+import { makeStyles } from '@material-ui/core/styles'
 
 const drawerWidth = 240;
 
@@ -108,7 +96,7 @@ export default function MenuAppBar(props) {
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        <Link href="/">
+        <Link color="inherit" href="/">
           <ListItem button 
               onClick={handleDrawerToggle} 
               selected={"/" === pathName}>
@@ -119,7 +107,7 @@ export default function MenuAppBar(props) {
           </ListItem>
         </Link>
 
-        <Link href="/votes">
+        <Link color="inherit" href="/votes">
           <ListItem button 
               onClick={handleDrawerToggle}
               selected={"/votes" === pathName}>
@@ -130,7 +118,7 @@ export default function MenuAppBar(props) {
           </ListItem>
         </Link>
 
-        <Link href="/votes/en-cours">
+        <Link color="inherit" href="/votes/en-cours">
           <ListItem button 
               onClick={handleDrawerToggle}
               selected={"/votes/en-cours" === pathName}>
@@ -141,7 +129,7 @@ export default function MenuAppBar(props) {
           </ListItem>
         </Link>
 
-        <Link href="/votes/termines">
+        <Link color="inherit" href="/votes/termines">
           <ListItem button 
               onClick={handleDrawerToggle}
               selected={"/votes/termines" === pathName}>
@@ -152,7 +140,7 @@ export default function MenuAppBar(props) {
           </ListItem>
         </Link>
 
-        <Link href="/votes/mes-votes">
+        <Link color="inherit" href="/votes/mes-votes">
           <ListItem button 
               onClick={handleDrawerToggle}
               selected={"/votes/mes-votes" === pathName}>
@@ -164,7 +152,7 @@ export default function MenuAppBar(props) {
         </Link>
 
 
-        <Link href="/votes/nouveau">
+        <Link color="inherit" href="/votes/nouveau">
           <ListItem button 
               onClick={handleDrawerToggle} 
               selected={"/votes/nouveau" === pathName}>

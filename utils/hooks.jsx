@@ -2,12 +2,12 @@ import { useEffect } from 'react'
 import Router from 'next/router'
 import useSWR from 'swr'
 
-const fetcher = (url) =>
-  fetch(url)
-    .then((r) => r.json())
-    .then((data) => {
-      return { user: data?.user || null }
-    })
+// const fetcher = (url) =>
+//   fetch(url)
+//     .then((r) => r.json())
+//     .then((data) => {
+//       return { user: data?.user || null }
+//     })
 
 export function useUser({ redirectTo, redirectIfFound } = {}) {
   const { data, error } = useSWR('/api/auth/user', fetcher)
@@ -28,4 +28,19 @@ export function useUser({ redirectTo, redirectIfFound } = {}) {
   }, [redirectTo, redirectIfFound, finished, hasUser])
 
   return error ? null : user
+}
+
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+export function useVotes(filter, page){
+    let query = ""
+    if (filter == "/mes-votes") query = "&createdBy=true"
+    if (filter == "/en-cours") query = "&inprogress=true"
+    if (filter == "/termines") query = "&finished=true"
+  
+  const { data, error } = useSWR(`/api/votes?page=${page}${query}`, fetcher)
+  return {
+    votes: data,
+    isLoading: !error && !data,
+    isError: error
+  }
 }

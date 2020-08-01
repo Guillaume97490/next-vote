@@ -1,17 +1,11 @@
-import Radio from '@material-ui/core/Radio';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import Button from '@material-ui/core/Button';
+import {Box, Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography} from '@material-ui/core';
+import { useState } from 'react';
+import Link from 'src/Link'
+
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import QueueIcon from '@material-ui/icons/Queue';
 import PersonIcon from '@material-ui/icons/Person';
-import { useState } from 'react';
-import Link from 'src/Link'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
-
 
 export default function VoteDetail({vote, user = null, hasVoted, result}) {
   const [voteStatus, setVoteStatus] = useState(vote.status);

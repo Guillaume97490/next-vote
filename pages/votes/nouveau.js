@@ -1,30 +1,21 @@
-
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
+import { useState } from 'react';
+import {Box, Button, CircularProgress, FormHelperText, Grid, Hidden, IconButton, 
+  InputAdornment, InputLabel, OutlinedInput, TextField, Typography} from '@material-ui/core'
 import clsx from 'clsx';
 import AddIcon from '@material-ui/icons/Add';
+import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { makeStyles } from '@material-ui/core/styles';
-import { red, green } from '@material-ui/core/colors';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import Alert from '@material-ui/lab/Alert';
 import Layout from 'components/Layout';
-import { useState } from 'react';
-import CloseIcon from '@material-ui/icons/Close';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Hidden from '@material-ui/core/Hidden';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
+import { makeStyles } from '@material-ui/core/styles';
+import { red, green } from '@material-ui/core/colors';
+import { useUser } from 'utils/hooks'
 
 export default function NewVote() {
+  const user = useUser({redirectTo:"/signin"})
+  if (user != undefined && user == null) return <div></div>
+
   const [quota, setQuota] = useState(1)
   const [subjetError, setSubjetError] = useState('')
   const [quotaError, setQuotaError] = useState('')
@@ -186,210 +177,213 @@ export default function NewVote() {
   return (
     <>
       <Layout>
-        <Box my={4}>
-          
-          <Typography variant="h4" component="h1" gutterBottom>
-            Nouveau vote
-          </Typography>
+        {user != undefined && user != null &&
+          <Box my={4}>
+            
+            <Typography variant="h4" component="h1" gutterBottom>
+              Nouveau vote
+            </Typography>
 
-          {submitError && 
-            <Box mt={2} className={classes.alert}>
-              <Alert severity="error">
-                {submitError}       
-              </Alert>
-            </Box>
-          }
+            {submitError && 
+              <Box mt={2} className={classes.alert}>
+                <Alert severity="error">
+                  {submitError}       
+                </Alert>
+              </Box>
+            }
 
-          {successAlert && 
-            <Box mt={2} className={classes.alert}>
-              <Alert severity="success">
-                {successAlert}       
-              </Alert>
-            </Box>
-          }
+            {successAlert && 
+              <Box mt={2} className={classes.alert}>
+                <Alert severity="success">
+                  {successAlert}       
+                </Alert>
+              </Box>
+            }
 
-          <form noValidate method="POST" onSubmit={handleSubmit}>
-          <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="center"
-          spacing={3}
-          >
-            <Grid item container alignItems="center" md={12}
-            >
-              <TextField onChange={handleChange}
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="subject"
-                label="Sujet du vote"
-                name="subject"
-                autoFocus
-                error={subjetError ? true : false}
-                helperText={subjetError ? subjetError : ''}
-              />
-
-            </Grid>
-
-          </Grid>
-          
-          <Grid
+            <form noValidate method="POST" onSubmit={handleSubmit}>
+            <Grid
             container
             direction="row"
             justify="center"
             alignItems="center"
             spacing={3}
-          >
-            <Grid item container alignItems="center" md={4}>
-              <Grid container item xs={2} alignItems="center" justify="center">
-                <IconButton className={classes.btnMinus} aria-label="remove" onClick={handleQuotaMinus}>
-                  <RemoveIcon className={classes.btnIcon}/>
-                </IconButton>
-              </Grid>
-              <Grid item xs={8}>
+            >
+              <Grid item container alignItems="center" md={12}
+              >
                 <TextField onChange={handleChange}
-                
-                margin="normal"
-                required
-                fullWidth
-                value={quota}
-                inputProps={{min: 0, style: { textAlign: 'center', fontSize: '1.5rem' }}}
-                id="quota"
-                label="Participants max"
-                name="quota"
-                error={quotaError ? true : false}
-                helperText={quotaError ? quotaError : ''}
-              />
-              </Grid>
-              <Grid container item xs={2} justify="center">
-                <IconButton className={classes.btnPlus} aria-label="add" onClick={handleQuotaPlus}>
-                  <AddIcon className={classes.btnIcon}/>
-                </IconButton>
-
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="subject"
+                  label="Sujet du vote"
+                  name="subject"
+                  autoFocus
+                  error={subjetError ? true : false}
+                  helperText={subjetError ? subjetError : ''}
+                />
 
               </Grid>
+
             </Grid>
             
-            
-            <Grid item container alignItems="center" md={8}>
-              <Grid container alignItems="center">
-                <Grid item xs={12} sm={12}>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="choiceOne"
-                      label='Choix 1'
-                      name='choice'
-                      className={'choices-input'}
-                      error={choiceOneError ? true : false}
-                      helperText={choiceOneError ? choiceOneError : ''}
-                    />
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={3}
+            >
+              <Grid item container alignItems="center" md={4}>
+                <Grid container item xs={2} alignItems="center" justify="center">
+                  <IconButton className={classes.btnMinus} aria-label="remove" onClick={handleQuotaMinus}>
+                    <RemoveIcon className={classes.btnIcon}/>
+                  </IconButton>
                 </Grid>
-                <Grid item xs={12} sm={12}>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="choiceTwo"
-                      label='Choix 2'
-                      name='choice'
-                      className={'choices-input'}
-                      error={choiceTwoError ? true : false}
-                      helperText={choiceTwoError ? choiceTwoError : ''}
-                    />
+                <Grid item xs={8}>
+                  <TextField onChange={handleChange}
+                  
+                  margin="normal"
+                  required
+                  fullWidth
+                  value={quota}
+                  inputProps={{min: 0, style: { textAlign: 'center', fontSize: '1.5rem' }}}
+                  id="quota"
+                  label="Participants max"
+                  name="quota"
+                  error={quotaError ? true : false}
+                  helperText={quotaError ? quotaError : ''}
+                />
                 </Grid>
+                <Grid container item xs={2} justify="center">
+                  <IconButton className={classes.btnPlus} aria-label="add" onClick={handleQuotaPlus}>
+                    <AddIcon className={classes.btnIcon}/>
+                  </IconButton>
 
-                
+
+                </Grid>
               </Grid>
-            </Grid>
-          
-          </Grid>
-
-          <Grid container spacing={3}>
-          <Hidden smDown implementation="js">
-            <Grid item container alignItems="center" md={4}>
-              <Grid container item xs={2}></Grid>
-              <Grid item xs={8}></Grid>
-              <Grid container item xs={2}></Grid>
-            </Grid>
-
-          </Hidden>
-
-            <Grid item container alignItems="center" md={8}>
-              {additionalChoice.map((choice, index) =>(
-                <Grid id={`choice-${index}`} key={choice} container alignItems="center">
-                  <Grid item xs={12} md={12}>
-                    
-                    <FormControl
-                      error={choiceError[index] ? true : false}
-                      required 
-                      fullWidth 
-                      className={clsx(classes.margin, classes.textField, 'choices-input')} 
-                      variant="outlined"
-                     >
-                      <InputLabel htmlFor="outlined-adornment-password">{`Choix ${index+3}`}</InputLabel>
-                      <OutlinedInput 
-                        name={`choices[${index}]`}
-                        endAdornment={
-                          <InputAdornment position="end">
-                            <IconButton
-                              aria-label="remove choice"
-                              edge="end"
-                              onClick={()=> handleRemoveChoice(index)}
-                            >
-                             <CloseIcon className={classes.btnMinus}/>
-                            </IconButton>
-                          </InputAdornment>
-                        }
-                        labelWidth={70}
+              
+              
+              <Grid item container alignItems="center" md={8}>
+                <Grid container alignItems="center">
+                  <Grid item xs={12} sm={12}>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="choiceOne"
+                        label='Choix 1'
+                        name='choice'
+                        className={'choices-input'}
+                        error={choiceOneError ? true : false}
+                        helperText={choiceOneError ? choiceOneError : ''}
                       />
-                      {choiceError[index] && 
-                        <FormHelperText>{choiceError[index]}</FormHelperText>
-                      }
-                    </FormControl>
                   </Grid>
+                  <Grid item xs={12} sm={12}>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="choiceTwo"
+                        label='Choix 2'
+                        name='choice'
+                        className={'choices-input'}
+                        error={choiceTwoError ? true : false}
+                        helperText={choiceTwoError ? choiceTwoError : ''}
+                      />
+                  </Grid>
+
                   
                 </Grid>
-              ))}
-            </Grid>
-            <Grid item md={4}></Grid>
-            <Grid item container alignItems="center" md={8}>
-              <Grid item container justify="center" sm={12}>
-                <Button onClick={handleAddChoice}>Ajouter 1 choix</Button>
               </Grid>
+            
             </Grid>
-          </Grid>
 
-          <Box mt={10}>
-            <Grid container justify="center">
-              <Grid item xs={12} sm={'auto'}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={buttonClassname}
-                  disabled={loading}
-                  size="large"
-                  startIcon={<SaveIcon />}
-                >
-                  Enregistrer
-                  {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-
+            <Grid container spacing={3}>
+            <Hidden smDown implementation="js">
+              <Grid item container alignItems="center" md={4}>
+                <Grid container item xs={2}></Grid>
+                <Grid item xs={8}></Grid>
+                <Grid container item xs={2}></Grid>
               </Grid>
 
+            </Hidden>
+
+              <Grid item container alignItems="center" md={8}>
+                {additionalChoice.map((choice, index) =>(
+                  <Grid id={`choice-${index}`} key={choice} container alignItems="center">
+                    <Grid item xs={12} md={12}>
+                      
+                      <FormControl
+                        error={choiceError[index] ? true : false}
+                        required 
+                        fullWidth 
+                        className={clsx(classes.margin, classes.textField, 'choices-input')} 
+                        variant="outlined"
+                      >
+                        <InputLabel htmlFor="outlined-adornment-password">{`Choix ${index+3}`}</InputLabel>
+                        <OutlinedInput 
+                          name={`choices[${index}]`}
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="remove choice"
+                                edge="end"
+                                onClick={()=> handleRemoveChoice(index)}
+                              >
+                              <CloseIcon className={classes.btnMinus}/>
+                              </IconButton>
+                            </InputAdornment>
+                          }
+                          labelWidth={70}
+                        />
+                        {choiceError[index] && 
+                          <FormHelperText>{choiceError[index]}</FormHelperText>
+                        }
+                      </FormControl>
+                    </Grid>
+                    
+                  </Grid>
+                ))}
+              </Grid>
+              <Grid item md={4}></Grid>
+              <Grid item container alignItems="center" md={8}>
+                <Grid item container justify="center" sm={12}>
+                  <Button onClick={handleAddChoice}>Ajouter 1 choix</Button>
+                </Grid>
+              </Grid>
             </Grid>
 
+            <Box mt={10}>
+              <Grid container justify="center">
+                <Grid item xs={12} sm={'auto'}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={buttonClassname}
+                    disabled={loading}
+                    size="large"
+                    startIcon={<SaveIcon />}
+                  >
+                    Enregistrer
+                    {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                  </Button>
+
+                </Grid>
+
+              </Grid>
+
+            </Box>
+
+            </form>
           </Box>
-
-          </form>
-        </Box>
+      
+        }
       </Layout>
     </>
   )

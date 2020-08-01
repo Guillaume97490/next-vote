@@ -1,26 +1,14 @@
-import React from 'react';
 import { useState } from 'react'
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
+import {Avatar, Box, Button, Container, CssBaseline, Checkbox, FormControl, FormControlLabel,
+  FormHelperText, Grid, IconButton, InputAdornment, Link, TextField, Typography} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Alert from '@material-ui/lab/Alert'; 
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Router from 'next/router'
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { useUser } from 'utils/hooks'
+
 
 function Copyright() {
   return (
@@ -69,6 +57,8 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function SignUp() {
+  const user = useUser({redirectTo:"/votes", redirectIfFound:true})
+  if (user != undefined && user == null) return <div></div>
 
   const handleClickShowPassword = () => setShowPassword(!showPassword )
 
@@ -170,110 +160,114 @@ export default function SignUp() {
 
   return (
     <Container className={classes.authForm} component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Inscription
-        </Typography>
-
-        {errorMsg && 
-          <Box mt={2} className={classes.alert}>
-            <Alert severity="error">
-              {errorMsg}       
-            </Alert>
-          </Box>
-        }
-        <form className={classes.form} onSubmit={handleSubmit} noValidate>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField onChange={handleChange}
-                autoComplete="login"
-                name="login"
-                variant="outlined"
-                required
-                fullWidth
-                id="login"
-                label="Nom d'utilisateur"
-                autoFocus
-                error={errorLoginMsg ? true : false}
-                helperText={errorLoginMsg ? errorLoginMsg : ''}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField onChange={handleChange}
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                label="Adresse email"
-                name="email"
-                autoComplete="email"
-                error={errorEmailMsg ? true : false}
-                helperText={errorEmailMsg ? errorEmailMsg : ''}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField onChange={handleChange}
-                variant="outlined"
-                required
-                fullWidth
-                name="password"
-                label="Mot de passe"
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                autoComplete="current-password"
-                error={errorPasswordMsg ? true : false}
-                InputProps={{
-                  endAdornment: <InputAdornment position="start">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>,
-                }}
-                helperText={errorPasswordMsg ? errorPasswordMsg : ''}
-              />
-            </Grid>
-            <Grid item xs={12}>
-            <FormControl required error component="fieldset" className={classes.formControl}>
-              <FormControlLabel
-                control={<Checkbox onChange={handleChange} id="conditionCheckbox" value="acceptConditions" color="primary" />}
-                label="J'accepte les conditions d'utilisations"
-              />
-              {errorConditionMsg && 
-                <FormHelperText>{errorConditionMsg}</FormHelperText>
-              }
-            </FormControl>
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
+      {user == undefined && user == null && 
+      <>
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
             Inscription
-          </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="/signin" variant="body2">
-                Déja inscrit ? connectez-vous
-              </Link>
+          </Typography>
+
+          {errorMsg && 
+            <Box mt={2} className={classes.alert}>
+              <Alert severity="error">
+                {errorMsg}       
+              </Alert>
+            </Box>
+          }
+          <form className={classes.form} onSubmit={handleSubmit} noValidate>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField onChange={handleChange}
+                  autoComplete="login"
+                  name="login"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="login"
+                  label="Nom d'utilisateur"
+                  autoFocus
+                  error={errorLoginMsg ? true : false}
+                  helperText={errorLoginMsg ? errorLoginMsg : ''}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField onChange={handleChange}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Adresse email"
+                  name="email"
+                  autoComplete="email"
+                  error={errorEmailMsg ? true : false}
+                  helperText={errorEmailMsg ? errorEmailMsg : ''}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField onChange={handleChange}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Mot de passe"
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  autoComplete="current-password"
+                  error={errorPasswordMsg ? true : false}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="start">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {!showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>,
+                  }}
+                  helperText={errorPasswordMsg ? errorPasswordMsg : ''}
+                />
+              </Grid>
+              <Grid item xs={12}>
+              <FormControl required error component="fieldset" className={classes.formControl}>
+                <FormControlLabel
+                  control={<Checkbox onChange={handleChange} id="conditionCheckbox" value="acceptConditions" color="primary" />}
+                  label="J'accepte les conditions d'utilisations"
+                />
+                {errorConditionMsg && 
+                  <FormHelperText>{errorConditionMsg}</FormHelperText>
+                }
+              </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-      </div>
-      <Box mt={5}>
-        <Copyright />
-      </Box>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Inscription
+            </Button>
+            <Grid container justify="flex-end">
+              <Grid item>
+                <Link href="/signin" variant="body2">
+                  Déja inscrit ? connectez-vous
+                </Link>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+        <Box mt={5}>
+          <Copyright />
+        </Box>
+      </>
+      }
     </Container>
   );
 }

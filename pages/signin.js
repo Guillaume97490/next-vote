@@ -1,38 +1,17 @@
-import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Head from 'next/head';
 import { useState } from 'react'
+import Head from 'next/head';
+import {Avatar, Box, Button, CircularProgress, Container, CssBaseline, InputAdornment,
+  Grid, Link, Typography, TextField} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert'; 
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { green } from '@material-ui/core/colors';
 import clsx from 'clsx';
 import { useRouter } from 'next/router'
-import { getSession } from 'utils/iron'
-import InputAdornment from '@material-ui/core/InputAdornment';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
-export async function getServerSideProps({req, res}) {
-  const session = await getSession(req)
-  if (session && res) {
-    res.writeHead(301, {
-      Location: '/'
-    })
-    res.end()
-  }
-  return { props: {} }
-}
+import { useUser } from 'utils/hooks'
 
 function Copyright() {
   return (
@@ -93,7 +72,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignIn() {
-
+  const user = useUser({redirectTo:"/votes", redirectIfFound:true})
+  if (user != undefined && user == null) return <div></div>
 
   const handleClickShowPassword = () => setShowPassword(!showPassword )
 
@@ -102,7 +82,6 @@ export default function SignIn() {
   };
   
   const router = useRouter()
-  // useUser({ redirectTo: '/', redirectIfFound: true })
   const classes = useStyles();
 
   const [errorMsg, setErrorMsg] = useState('')
@@ -159,126 +138,127 @@ export default function SignIn() {
       })
 
       if (res.status === 200) {
-          // setSuccess(true);
+          // setSuccess(true);  
           router.push('/')
           // setLoading(false);
       } else {
         const errorMsg = JSON.parse(await res.text()).errorMsg
         setErrorMsg(errorMsg)
+        setLoading(false);
       }
-      setLoading(false);
     } catch (error) {
       setErrorMsg("Un probleme est survenu")
       setLoading(false);
     }
     
-
-    
-    
-    
   }
 
   return (
+    
     <Container className={classes.authForm} component="main" maxWidth="xs">
+      {user == undefined && user == null && 
+        <>
+          <Head><title>Connexion</title></Head>
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Connexion
+            </Typography>
 
-      <Head><title>Connexion</title></Head>
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Connexion
-        </Typography>
+            {errorMsg && 
+              <Box mt={2} className={classes.alert}>
+                <Alert severity="error">
+                  {errorMsg}       
+                </Alert>
+              </Box>
+            }
 
-        {errorMsg && 
-          <Box mt={2} className={classes.alert}>
-            <Alert severity="error">
-              {errorMsg}       
-            </Alert>
+            <form className={classes.form} onSubmit={handleSubmit} noValidate>
+              <TextField onChange={handleChange}
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Adresse email"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                error={errorEmailMsg ? true : false}
+                helperText={errorEmailMsg ? errorEmailMsg : ''}
+              />
+              <TextField onChange={handleChange}
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Mot de passe"
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                autoComplete="current-password"
+                error={errorPasswordMsg ? true : false}
+                InputProps={{
+                  endAdornment: <InputAdornment position="start">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {!showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>,
+                }}
+                helperText={errorPasswordMsg ? errorPasswordMsg : ''}
+              />
+
+
+
+
+
+              <Box mt={2}></Box>
+              {/* <FormControlLabel
+                control={<Checkbox value="remember" color="primary" />}
+                label="Se rappeler de moi"
+              /> */}
+              <Button
+                type="submit"
+                fullWidth
+                size="large"
+                variant="contained"
+                color="primary"
+                // className={classes.submit}
+                className={buttonClassname}
+                disabled={loading}
+              >
+                Connexion
+              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </Button>
+              <Box mb={2}></Box>
+              <Grid container>
+                <Grid item xs>
+                  {/* <Link href="#" variant="body2">
+                    Mot de passe oublié ?
+                  </Link> */}
+                </Grid>
+                <Grid item>
+                  <Link href="/signup" variant="body2">
+                    {"Créer un compte"}
+                  </Link>
+                </Grid>
+              </Grid>
+            </form>
+          </div>
+          <Box mt={8}>
+            <Copyright />
           </Box>
-        }
+        </>
+      }
 
-        <form className={classes.form} onSubmit={handleSubmit} noValidate>
-          <TextField onChange={handleChange}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Adresse email"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            error={errorEmailMsg ? true : false}
-            helperText={errorEmailMsg ? errorEmailMsg : ''}
-          />
-          <TextField onChange={handleChange}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Mot de passe"
-            type={showPassword ? 'text' : 'password'}
-            id="password"
-            autoComplete="current-password"
-            error={errorPasswordMsg ? true : false}
-            InputProps={{
-              endAdornment: <InputAdornment position="start">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>,
-            }}
-            helperText={errorPasswordMsg ? errorPasswordMsg : ''}
-          />
-
-
-
-
-
-          <Box mt={2}></Box>
-          {/* <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Se rappeler de moi"
-          /> */}
-          <Button
-            type="submit"
-            fullWidth
-            size="large"
-            variant="contained"
-            color="primary"
-            // className={classes.submit}
-            className={buttonClassname}
-            disabled={loading}
-          >
-            Connexion
-          {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-          </Button>
-          <Box mb={2}></Box>
-          <Grid container>
-            <Grid item xs>
-              {/* <Link href="#" variant="body2">
-                Mot de passe oublié ?
-              </Link> */}
-            </Grid>
-            <Grid item>
-              <Link href="/signup" variant="body2">
-                {"Créer un compte"}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }

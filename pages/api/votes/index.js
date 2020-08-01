@@ -9,7 +9,7 @@ export default async (req, res, query) => {
     case 'GET':
       const currentPage = (typeof req.query.page !== "undefined" || req.query.page > 0 ) ? req.query.page : 1
       const pageNb = Math.max(0, currentPage);
-      const perPage = 3
+      const perPage = 4
       const limit = perPage 
       const skip = perPage * pageNb - perPage
 
