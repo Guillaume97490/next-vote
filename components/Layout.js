@@ -4,7 +4,7 @@ import Container from '@material-ui/core/Container';
 
 const Layout = props => (
   <>
-    <Appbar />
+    <Appbar title={props.title}/>
       <Container maxWidth="md">
         {props.children}
       </Container>

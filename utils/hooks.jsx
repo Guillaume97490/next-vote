@@ -44,3 +44,20 @@ export function useVotes(filter, page){
     isError: error
   }
 }
+
+export function useVote(voteId){
+  const { data, error } = useSWR(`/api/votes/${voteId}`, fetcher)
+  return {
+    vote: data,
+    isLoading: !error && !data,
+    isError: error
+  }
+}
+export function useResult(voteId){
+  const { data, error } = useSWR(`/api/votes/${voteId}/result`, fetcher)
+  return {
+    result: data,
+    isLoading: !error && !data,
+    isError: error
+  }
+}

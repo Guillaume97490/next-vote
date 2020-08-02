@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router'
 import { useUser } from 'utils/hooks'
 import {AppBar, Divider, Drawer, Hidden, IconButton, List, ListItem, ListItemIcon, ListItemText,
-  Menu, MenuItem, SwipeableDrawer, Toolbar, Typography} from '@material-ui/core';
+  Menu, MenuItem, SwipeableDrawer, Toolbar, Typography, Button} from '@material-ui/core';
 // import Link from 'next/link'
 import Link from 'src/Link'
 import MenuIcon from '@material-ui/icons/Menu'
@@ -15,6 +15,10 @@ import ReorderIcon from '@material-ui/icons/Reorder'
 import BookmarkIcon from '@material-ui/icons/Bookmark'
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew'
 import { makeStyles } from '@material-ui/core/styles'
+import { red, green } from '@material-ui/core/colors';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import Head from 'next/head';
 
 const drawerWidth = 240;
 
@@ -95,7 +99,7 @@ export default function MenuAppBar(props) {
     <div>
       <div className={classes.toolbar} />
       <Divider />
-      <List>
+      {/* <List> */}
         <Link color="inherit" href="/">
           <ListItem button 
               onClick={handleDrawerToggle} 
@@ -106,78 +110,108 @@ export default function MenuAppBar(props) {
             <ListItemText primary="Accueil" />
           </ListItem>
         </Link>
+        {user && 
+          <>
+            <Link color="inherit" href="/votes">
+              <ListItem button 
+                  onClick={handleDrawerToggle}
+                  selected={"/votes" === pathName}>
+                <ListItemIcon>
+                  <ReorderIcon />
+                </ListItemIcon>
+                <ListItemText primary="Tous les votes" />
+              </ListItem>
+            </Link>
 
-        <Link color="inherit" href="/votes">
-          <ListItem button 
-              onClick={handleDrawerToggle}
-              selected={"/votes" === pathName}>
-            <ListItemIcon>
-              <ReorderIcon />
-            </ListItemIcon>
-            <ListItemText primary="Tous les votes" />
-          </ListItem>
-        </Link>
+            <Link color="inherit" href="/votes/en-cours">
+              <ListItem button 
+                  onClick={handleDrawerToggle}
+                  selected={"/votes/en-cours" === pathName}>
+                <ListItemIcon>
+                  <PlaylistPlayIcon />
+                </ListItemIcon>
+                <ListItemText primary="Votes en cours" />
+              </ListItem>
+            </Link>
 
-        <Link color="inherit" href="/votes/en-cours">
-          <ListItem button 
-              onClick={handleDrawerToggle}
-              selected={"/votes/en-cours" === pathName}>
-            <ListItemIcon>
-              <PlaylistPlayIcon />
-            </ListItemIcon>
-            <ListItemText primary="Votes en cours" />
-          </ListItem>
-        </Link>
+            <Link color="inherit" href="/votes/termines">
+              <ListItem button 
+                  onClick={handleDrawerToggle}
+                  selected={"/votes/termines" === pathName}>
+                <ListItemIcon>
+                  <PlaylistAddCheckIcon />
+                </ListItemIcon>
+                <ListItemText primary="Votes terminés" />
+              </ListItem>
+            </Link>
 
-        <Link color="inherit" href="/votes/termines">
-          <ListItem button 
-              onClick={handleDrawerToggle}
-              selected={"/votes/termines" === pathName}>
-            <ListItemIcon>
-              <PlaylistAddCheckIcon />
-            </ListItemIcon>
-            <ListItemText primary="Votes terminés" />
-          </ListItem>
-        </Link>
-
-        <Link color="inherit" href="/votes/mes-votes">
-          <ListItem button 
-              onClick={handleDrawerToggle}
-              selected={"/votes/mes-votes" === pathName}>
-            <ListItemIcon>
-              <BookmarkIcon />
-            </ListItemIcon>
-            <ListItemText primary="Mes votes" />
-          </ListItem>
-        </Link>
+            <Link color="inherit" href="/votes/mes-votes">
+              <ListItem button 
+                  onClick={handleDrawerToggle}
+                  selected={"/votes/mes-votes" === pathName}>
+                <ListItemIcon>
+                  <BookmarkIcon />
+                </ListItemIcon>
+                <ListItemText primary="Mes votes" />
+              </ListItem>
+            </Link>
 
 
-        <Link color="inherit" href="/votes/nouveau">
-          <ListItem button 
-              onClick={handleDrawerToggle} 
-              selected={"/votes/nouveau" === pathName}>
-            <ListItemIcon>
-              <PlaylistAddIcon />
-            </ListItemIcon>
-            <ListItemText primary="Créer un vote" />
-          </ListItem>
-        </Link>
+            <Link color="inherit" href="/votes/nouveau">
+              <ListItem button 
+                  onClick={handleDrawerToggle} 
+                  selected={"/votes/nouveau" === pathName}>
+                <ListItemIcon>
+                  <PlaylistAddIcon />
+                </ListItemIcon>
+                <ListItemText primary="Créer un vote" />
+              </ListItem>
+            </Link>
+          </>
+        }
 
         
         
         
         
-      </List>
+      {/* </List> */}
 
       <Divider />
-      <List>
-        <ListItem button onClick={handleLogout}>
-          <ListItemIcon>
-            <PowerSettingsNewIcon color="error" />
-          </ListItemIcon>
-          <ListItemText primary="Se déconnecter" />
-        </ListItem>
-      </List>
+
+      {user ?
+        // <List>
+          <ListItem button onClick={handleLogout}>
+            <ListItemIcon>
+              <PowerSettingsNewIcon color="error" />
+            </ListItemIcon>
+            <ListItemText primary="Se déconnecter" />
+          </ListItem>
+        // </List>
+      :
+      <>
+        <Link color="inherit" href="/signin">
+          <ListItem button 
+              onClick={handleDrawerToggle} 
+              selected={"/signin" === pathName}>
+            <ListItemIcon>
+              <AccountBoxIcon />
+            </ListItemIcon>
+            <ListItemText primary="Connexion" />
+          </ListItem>
+        </Link> 
+
+        <Link color="inherit" href="/signup">
+          <ListItem button 
+              onClick={handleDrawerToggle} 
+              selected={"/signup" === pathName}>
+            <ListItemIcon>
+              <PersonAddIcon />
+            </ListItemIcon>
+            <ListItemText primary="Inscription" />
+          </ListItem>
+        </Link> 
+      </>
+      }
 
       
     </div>
@@ -187,6 +221,7 @@ export default function MenuAppBar(props) {
 
   return (
     <>
+      <Head><title>{props.title || "Next-vote"}</title></Head>
       
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
@@ -200,9 +235,9 @@ export default function MenuAppBar(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            Next-Votes
+            {props.title || "Next-vote"}
           </Typography>
-          {user && (
+          {user ? (
             <div>
               <IconButton
                 aria-label="account of current user"
@@ -239,7 +274,17 @@ export default function MenuAppBar(props) {
                 }
               </Menu>
             </div>
-          )}
+          )
+        :
+        <Button 
+          variant="contained" 
+          style={{backgroundColor:"#cae1f9", color:"#48568c"}}
+          href="/signin"
+        >
+          Connexion
+          </Button>
+        }
+          
         </Toolbar>
         
       </AppBar>

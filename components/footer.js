@@ -46,10 +46,10 @@ export default function StickyFooter() {
   const classes = useStyles();
   return (
     <footer className={classes.footer}>
-    <Container align="center" maxWidth="sm">
-      {/* <Typography variant="body1">My sticky footer can be found here.</Typography> */}
-      <Copyright />
-    </Container>
+      <Container align="center" maxWidth="sm">
+        {/* <Typography variant="body1">My sticky footer can be found here.</Typography> */}
+        <Copyright />
+      </Container>
     </footer>
   );
 }

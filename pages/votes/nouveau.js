@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {Box, Button, CircularProgress, FormControl, FormHelperText, Grid, Hidden, IconButton, 
+import {Box, Button, Card, CardContent, CircularProgress, Dialog, DialogTitle, DialogActions, FormControl, FormHelperText, Grid, Grow, IconButton, 
   InputAdornment, InputLabel, OutlinedInput, TextField, Typography} from '@material-ui/core'
 import clsx from 'clsx';
 import AddIcon from '@material-ui/icons/Add';
@@ -11,6 +11,11 @@ import Layout from 'components/Layout';
 import { makeStyles } from '@material-ui/core/styles';
 import { red, green } from '@material-ui/core/colors';
 import { useUser } from 'utils/hooks'
+
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 export default function NewVote() {
   const user = useUser({redirectTo:"/signin"})
@@ -27,6 +32,89 @@ export default function NewVote() {
   const [success, setSuccess] = useState(false);
   const [additionalChoice, setAdditionalChoice] = useState([])
   const [successAlert, setSuccessAlert] = useState('')
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [allowStep0, setAllowStep0] = useState(0)
+  const [allowStep1, setAllowStep1] = useState(0)
+  const [allowStep2, setAllowStep2] = useState(0)
+  const [allowStep3, setAllowStep3] = useState(0)
+  const [subjectValue, setSubjectValue] = useState("")
+  const [choiceOneValue, setChoiceOneValue] = useState("")
+  const [choiceTwoValue, setChoiceTwoValue] = useState("")
+  const [additionalChoiceValues,setAdditionalChoiceValues] = useState([])
+  const steps = getSteps();
+
+  const handleNext = () => {
+    if (activeStep === 0) {
+    }
+    setTimeout(() => {
+      if (activeStep === 1) {
+        const choices = document.querySelectorAll('.choices-input input')
+        const event = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true
+        });
+        let keyupEvent = new Event('keyup');
+        Array.from(choices).map((choice,i,arr) => {
+          if (i > 1) {
+            choice.value = additionalChoiceValues[i-2]
+            choice.dispatchEvent(event)
+          }
+        })
+      }
+      
+    }, 200);
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    
+  };
+
+  const handleBack = () => {
+    setTimeout(() => {
+      if (activeStep === 3) {
+        const choices = document.querySelectorAll('.choices-input input')
+        const event = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true
+        });
+        Array.from(choices).map((choice,i,arr) => {
+          if (i > 1) {
+            choice.value = additionalChoiceValues[i-2]
+          }
+        })
+      }
+      
+    }, 200);
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+
+  const handleAdditionalChoiceChange = () => {
+    let canNext = 1
+    const choices = document.querySelectorAll('.choices-input input')
+      const arrayChoices = []
+      const errorChoices = {}
+      Array.from(choices).map((choice,i,arr) => {
+        arrayChoices.push(choice.value)
+        if (!choice.value.length) {
+          errorChoices[i-2] = "Ce champ est requis"
+          setChoiceError(errorChoices)
+          canNext = 0
+        } else {
+          errorChoices[i-2] = ""
+          setChoiceError(errorChoices)
+        }
+        if (arr.length -1 === i) {
+          setAllowStep2(canNext)
+          setAdditionalChoiceValues(arrayChoices.slice(2,arrayChoices.length))
+        }
+      })
+    }
+
 
   const useStyles = makeStyles((theme) => ({
     btnMinus: {
@@ -70,26 +158,89 @@ export default function NewVote() {
     let last = additionalChoice.length ? additionalChoice.slice(-1) : 0
     const newChoices = [...additionalChoice, Number(last) + 1 ]
     setAdditionalChoice(newChoices)
+    setAllowStep2(0)
   }
 
-  const handleRemoveChoice = (index) => setAdditionalChoice(additionalChoice.filter((_, i) => i !== index));
+  const handleRemoveChoice = (index) => {
+    setAdditionalChoice(additionalChoice.filter((_, i) => i !== index));
+    setTimeout(() => {
+      handleAdditionalChoiceChange()
+    }, 200);
+  }
 
   const handleChange = (e) => {
     const input = e.currentTarget.id
     const value = e.currentTarget.value
     switch (input) {
       case "subject":
+        setSubjectValue(value)
         if (subjetError) setSubjetError('')
-        value.length ? '' : setSubjetError('Le sujet du vote est obligatoire')
+        if (!value.length) {
+          setSubjetError('Le sujet du vote est obligatoire')
+          setAllowStep0(0)
+        } else {
+          setAllowStep0(1)
+        }
         break;
       case "quota":
         if (quotaError) setQuotaError('')
-        parseInt(value) ? setQuota(Math.abs(parseInt(value))) : setQuotaError('Le nombre de participant max dois etre positif')
+        if (parseInt(value)){
+          setQuota(Math.abs(parseInt(value))) 
+          setAllowStep1(1)
+        } else {
+          setQuotaError('Le nombre de participant max dois etre positif')
+          setAllowStep1(0)
+        }
         break;
+      case "choiceOne":
+        setChoiceOneValue(value)
+        if (value && choiceTwoValue) setAllowStep2(1)
+        if (!value.length || !choiceTwoValue.length) setAllowStep2(0)
+        
+        break;
+      case "choiceTwo":
+        setChoiceTwoValue(value)
+        if (choiceOneValue && value) setAllowStep2(1)
+        if (!choiceOneValue.length || !value.length) setAllowStep2(0)
+        break;
+
       default:
         break;
     }
   }
+
+  function SimpleDialog(props) {
+    const classes = useStyles();
+    const { onClose, selectedValue, open } = props;
+
+    const handleClose = () => {
+      window.location.href = '/votes/mes-votes'
+    };
+
+    const handleListItemClick = (value) => {
+      onClose(value);
+    };
+
+
+    return (
+      <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={true}>
+        <DialogTitle style={{color: green[500]}} id="simple-dialog-title">{successAlert}</DialogTitle>
+        <Grow in={true}
+          {...(true ? { timeout: 1000 } : {})}
+        >
+          <Box align="center">
+            <CheckCircleOutlineIcon style={{fontSize:"5rem", color: green[500]}}/>
+          </Box>
+        </Grow>
+        <DialogActions>
+          <Button onClick={handleClose}>Fermer</Button>
+
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+
 
 
   async function handleSubmit(e) {
@@ -119,10 +270,10 @@ export default function NewVote() {
     })
 
     const body = {
-      subject: e.currentTarget.subject.value,
-      quota: e.currentTarget.quota.value,
-      choiceOne: e.currentTarget.choiceOne.value,
-      choiceTwo: e.currentTarget.choiceTwo.value
+      subject: subjectValue,
+      quota: quota,
+      choiceOne: choiceOneValue,
+      choiceTwo: choiceTwoValue
     }
 
 
@@ -137,13 +288,13 @@ export default function NewVote() {
       canSubmit = false
     }
 
-    body.choices = arrayChoices
 
+
+    body.choices = [choiceOneValue, choiceTwoValue, ...additionalChoiceValues]
 
     if (!canSubmit) return 
 
     try {
-      // setSuccess(false);
       setLoading(true);
 
       const res = await fetch('/api/votes', {
@@ -153,8 +304,8 @@ export default function NewVote() {
       })
 
       if (res.status === 201) {
-        setSuccessAlert("Le vote est créer")
-        window.location.href = '/votes/mes-votes'
+        setSuccessAlert("Votre vote a bien été créer")
+        // window.location.href = '/votes/mes-votes'
       } else {
         const errorMsg = JSON.parse(await res.text()).errorMsg
         setSubmitMsg(errorMsg)
@@ -173,16 +324,254 @@ export default function NewVote() {
     [classes.buttonSuccess]: success,
   });
 
+  function getSteps() {
+    return ['Sujet du vote', 'Nombre de participant', 'Choix disponible','Recap'];
+  }
+  
+  function getStepContent(stepIndex) {
+    switch (stepIndex) {
+      case 0:
+        return 'Sur quel sujet les utilisateurs voterons ?';
+      case 1:
+        return 'Quel sera le nombre de personnes maximum autorisés a s\'inscrire à ce vote ?'
+      case 2:
+        return 'Quel serons les choix disponible sur ce vote ?';
+      case 3:
+        return 'Récapitulons ! Vous avez choisis :';
+      default:
+        return 'Unknown stepIndex';
+    }
+  }
+
 
   return (
     <>
-      <Layout>
+      <Layout title="Nouveau vote">
+
         {user != undefined && user != null &&
+            <form noValidate method="POST" onSubmit={handleSubmit}>
           <Box my={4}>
             
-            <Typography variant="h4" component="h1" gutterBottom>
-              Nouveau vote
-            </Typography>
+
+          <div className={classes.root}>
+            <Stepper activeStep={activeStep} style={{padding:0, margin: "0 -15px"}} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            <div>
+              {activeStep === steps.length ? (
+                <div>
+                  <Typography className={classes.instructions}>All steps completed</Typography>
+                  <Button onClick={handleReset}>Reset</Button>
+                </div>
+              ) : (
+                <Box mt={5}>
+                  <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
+                  <div>
+
+                    {activeStep === 0 && 
+                      <TextField onChange={handleChange}
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      fullWidth
+                      value={subjectValue}
+                      id="subject"
+                      label="Sujet du vote"
+                      name="subject"
+                      autoFocus
+                      error={subjetError ? true : false}
+                      helperText={subjetError ? subjetError : ''}
+                      />
+                    }
+
+                    {activeStep === 1 && 
+                      <Grid item container alignItems="center" md={4}>
+                      <Grid container item xs={2} alignItems="center" justify="center">
+                        <IconButton className={classes.btnMinus} aria-label="remove" onClick={handleQuotaMinus}>
+                          <RemoveIcon className={classes.btnIcon}/>
+                        </IconButton>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <TextField onChange={handleChange}
+                        
+                        margin="normal"
+                        required
+                        fullWidth
+                        value={quota}
+                        inputProps={{min: 0, style: { textAlign: 'center', fontSize: '1.5rem' }}}
+                        id="quota"
+                        label="Participants max"
+                        name="quota"
+                        error={quotaError ? true : false}
+                        helperText={quotaError ? quotaError : ''}
+                      />
+                      </Grid>
+                      <Grid container item xs={2} justify="center">
+                        <IconButton className={classes.btnPlus} aria-label="add" onClick={handleQuotaPlus}>
+                          <AddIcon className={classes.btnIcon}/>
+                        </IconButton>
+      
+      
+                      </Grid>
+                    </Grid>
+                    }
+
+                    {activeStep === 2 &&
+                    <>
+                      <Grid item container alignItems="center" md={12}>
+                       
+                          <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            onChange={handleChange}
+                            fullWidth
+                            value={choiceOneValue}
+                            id="choiceOne"
+                            label='Choix 1'
+                            name='choice'
+                            className={'choices-input'}
+                            error={choiceOneError ? true : false}
+                            helperText={choiceOneError ? choiceOneError : ''}
+                          />
+                        
+                        <Grid item xs={12} sm={12}>
+                          <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            onChange={handleChange}
+                            fullWidth
+                            value={choiceTwoValue}
+                            id="choiceTwo"
+                            label='Choix 2'
+                            name='choice'
+                            className={'choices-input'}
+                            error={choiceTwoError ? true : false}
+                            helperText={choiceTwoError ? choiceTwoError : ''}
+                          />
+                          <Box mb="15px"></Box>
+                        </Grid>
+                      </Grid>
+
+                      
+                        <Grid item container alignItems="center" md={12}>
+                          {additionalChoice.map((choice, index) =>(
+                            <Grid id={`choice-${index}`} key={choice} container alignItems="center">
+                              
+                                
+                                <FormControl onChange={handleAdditionalChoiceChange} focused={additionalChoiceValues[index] == undefined ? false : true}
+                                  error={choiceError[index] ? true : false}
+                                  required 
+                                  fullWidth 
+                                  
+                                  className={clsx(classes.margin, classes.textField, 'choices-input')} 
+                                  variant="outlined"
+                                >
+                                  <InputLabel htmlFor="outlined-adornment-password">{`Choix ${index+3}`}</InputLabel>
+                                  <OutlinedInput
+                                    name={`choices[${index}]`}
+                                    endAdornment={
+                                      <InputAdornment position="end">
+                                        <IconButton
+                                          aria-label="remove choice"
+                                          edge="end"
+                                          onClick={()=> handleRemoveChoice(index)}
+                                        >
+                                        <CloseIcon className={classes.btnMinus}/>
+                                        </IconButton>
+                                      </InputAdornment>
+                                    }
+                                    labelWidth={70}
+                                  />
+                                  {choiceError[index] && 
+                                    <FormHelperText>{choiceError[index]}</FormHelperText>
+                                  }
+                                </FormControl>
+                              
+                              
+                            </Grid>
+                          ))}
+                        </Grid>
+                        
+                        <Grid item container alignItems="center" md={12}>
+                          {/* <Grid item container justify="center" sm={12}> */}
+                            <Button onClick={handleAddChoice}>Ajouter 1 choix</Button>
+                          {/* </Grid> */}
+                        </Grid>
+                      
+                      </>
+                    }
+
+                    {activeStep === 3 &&
+                      <>
+                        <Box my={3}>
+                          <Card className={classes.root}>
+                            <CardContent>
+                              <Typography>
+                                Sujet du vote : <Typography variant="h6" component="span">{subjectValue}</Typography>
+                              </Typography>
+
+                              <Typography>
+                                Participants maxi : <Typography variant="h6" component="span">{quota}</Typography>
+                              </Typography>
+
+                              {[choiceOneValue, choiceTwoValue, ...additionalChoiceValues].map((choice, i) => 
+                                <Typography key={i}>
+                                Choix {i+1} : <Typography variant="h6" component="span">{choice}</Typography>
+                                </Typography>
+                              )} 
+
+                            </CardContent>
+
+                          </Card>
+
+                        </Box>
+                        
+
+                      </>
+                    }
+
+
+                    <Box textAlign="right" mt={5}>
+                      <Button
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        className={classes.backButton}
+                      >
+                        Retour
+                      </Button>
+                      
+                      <Button 
+                        disabled={
+                          !allowStep0 && activeStep == 0 ||
+                          // (!choiceOneValue.length || !choiceTwoValue.length) && activeStep == 2 ||
+                          !allowStep2 && activeStep == 2 ||
+                          loading
+                        }
+                        variant="contained" color="primary"
+                        onClick={activeStep !== steps.length -1 ? handleNext : handleSubmit}>
+                        {activeStep === steps.length - 1 ? 'Valider' : 'Suivant'}
+                        {loading && <CircularProgress size={24} className={classes.buttonProgress} />
+                        }
+                      </Button>
+
+                    </Box>
+
+                  
+                  </div>
+                </Box>
+              )}
+            </div>
+          </div>
+
+
+            
+            
 
             {submitError && 
               <Box mt={2} className={classes.alert}>
@@ -193,14 +582,16 @@ export default function NewVote() {
             }
 
             {successAlert && 
-              <Box mt={2} className={classes.alert}>
-                <Alert severity="success">
-                  {successAlert}       
-                </Alert>
+              <Box>
+                <SimpleDialog open={open} />
               </Box>
+              // <Box mt={2} className={classes.alert}>
+              //   <Alert severity="success">
+              //     {successAlert}       
+              //   </Alert>
+              // </Box>
             }
 
-            <form noValidate method="POST" onSubmit={handleSubmit}>
             <Grid
             container
             direction="row"
@@ -210,7 +601,7 @@ export default function NewVote() {
             >
               <Grid item container alignItems="center" md={12}
               >
-                <TextField onChange={handleChange}
+                {/* <TextField onChange={handleChange}
                   variant="outlined"
                   margin="normal"
                   required
@@ -221,7 +612,7 @@ export default function NewVote() {
                   autoFocus
                   error={subjetError ? true : false}
                   helperText={subjetError ? subjetError : ''}
-                />
+                /> */}
 
               </Grid>
 
@@ -234,130 +625,11 @@ export default function NewVote() {
               alignItems="center"
               spacing={3}
             >
-              <Grid item container alignItems="center" md={4}>
-                <Grid container item xs={2} alignItems="center" justify="center">
-                  <IconButton className={classes.btnMinus} aria-label="remove" onClick={handleQuotaMinus}>
-                    <RemoveIcon className={classes.btnIcon}/>
-                  </IconButton>
-                </Grid>
-                <Grid item xs={8}>
-                  <TextField onChange={handleChange}
-                  
-                  margin="normal"
-                  required
-                  fullWidth
-                  value={quota}
-                  inputProps={{min: 0, style: { textAlign: 'center', fontSize: '1.5rem' }}}
-                  id="quota"
-                  label="Participants max"
-                  name="quota"
-                  error={quotaError ? true : false}
-                  helperText={quotaError ? quotaError : ''}
-                />
-                </Grid>
-                <Grid container item xs={2} justify="center">
-                  <IconButton className={classes.btnPlus} aria-label="add" onClick={handleQuotaPlus}>
-                    <AddIcon className={classes.btnIcon}/>
-                  </IconButton>
+            </Grid>
 
-
-                </Grid>
-              </Grid>
-              
-              
-              <Grid item container alignItems="center" md={8}>
-                <Grid container alignItems="center">
-                  <Grid item xs={12} sm={12}>
-                      <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="choiceOne"
-                        label='Choix 1'
-                        name='choice'
-                        className={'choices-input'}
-                        error={choiceOneError ? true : false}
-                        helperText={choiceOneError ? choiceOneError : ''}
-                      />
-                  </Grid>
-                  <Grid item xs={12} sm={12}>
-                      <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="choiceTwo"
-                        label='Choix 2'
-                        name='choice'
-                        className={'choices-input'}
-                        error={choiceTwoError ? true : false}
-                        helperText={choiceTwoError ? choiceTwoError : ''}
-                      />
-                  </Grid>
-
-                  
-                </Grid>
-              </Grid>
             
-            </Grid>
 
-            <Grid container spacing={3}>
-            <Hidden smDown implementation="js">
-              <Grid item container alignItems="center" md={4}>
-                <Grid container item xs={2}></Grid>
-                <Grid item xs={8}></Grid>
-                <Grid container item xs={2}></Grid>
-              </Grid>
-
-            </Hidden>
-
-              <Grid item container alignItems="center" md={8}>
-                {additionalChoice.map((choice, index) =>(
-                  <Grid id={`choice-${index}`} key={choice} container alignItems="center">
-                    <Grid item xs={12} md={12}>
-                      
-                      <FormControl
-                        error={choiceError[index] ? true : false}
-                        required 
-                        fullWidth 
-                        className={clsx(classes.margin, classes.textField, 'choices-input')} 
-                        variant="outlined"
-                      >
-                        <InputLabel htmlFor="outlined-adornment-password">{`Choix ${index+3}`}</InputLabel>
-                        <OutlinedInput 
-                          name={`choices[${index}]`}
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="remove choice"
-                                edge="end"
-                                onClick={()=> handleRemoveChoice(index)}
-                              >
-                              <CloseIcon className={classes.btnMinus}/>
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                          labelWidth={70}
-                        />
-                        {choiceError[index] && 
-                          <FormHelperText>{choiceError[index]}</FormHelperText>
-                        }
-                      </FormControl>
-                    </Grid>
-                    
-                  </Grid>
-                ))}
-              </Grid>
-              <Grid item md={4}></Grid>
-              <Grid item container alignItems="center" md={8}>
-                <Grid item container justify="center" sm={12}>
-                  <Button onClick={handleAddChoice}>Ajouter 1 choix</Button>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Box mt={10}>
+            {/* <Box mt={10}>
               <Grid container justify="center">
                 <Grid item xs={12} sm={'auto'}>
                   <Button
@@ -378,12 +650,13 @@ export default function NewVote() {
 
               </Grid>
 
-            </Box>
+            </Box> */}
 
-            </form>
           </Box>
       
+        </form>
         }
+
       </Layout>
     </>
   )
