@@ -37,36 +37,3 @@ Lancement en local:
 ```sh
 npm run dev
 ```
-
-
-Exécuter toutes les migrations de base de données non appliquées
-```sh
-migrate-mongo up
-```
-
-Annuler la dernière migration de base de données appliquées
-```sh
-migrate-mongo down
-```
-
-Aficher le journal des modifications de la base de données
-```sh
-migrate-mongo status
-```
-
-## Documentation
-Pour générer la documentation
-```sh
-npm run doc
-```
-
-Pour consulter la documentation : **back/docs/index.html**
-
-
-
-<!-- ! A FAIRE -->
-
-<!-- TODO -->
-**modifier ses sujets si ils n'ont pas n'utilisateurs inscrit dessus**
-**js doc - documentation**
-**migration**

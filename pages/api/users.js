@@ -4,11 +4,11 @@ export default async (req, res) => {
   const { method } = req
 
   switch (method) {
-    case 'GET':
-      const users = await userController.list()
-      res.json(users)
+    // case 'GET':
+    //   const users = await userController.list()
+    //   res.json(users)
       
-      break;
+    //   break;
 
     case 'POST':
       const {email, password} = JSON.parse(req.body)
@@ -18,7 +18,7 @@ export default async (req, res) => {
       break;
 
     default:
-      res.setHeader('Allow', ['GET', 'POST'])
+      res.setHeader('Allow', ['POST'])
       res.status(405).end(`Method ${method} Not Allowed`)
       break;
   }
